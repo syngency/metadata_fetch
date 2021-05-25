@@ -1,14 +1,15 @@
 import 'dart:convert';
+
 import 'package:html/dom.dart';
-import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' as parser;
+import 'package:http/http.dart' as http;
 import 'package:metadata_fetch/metadata_fetch.dart';
 import 'package:metadata_fetch/src/parsers/parsers.dart';
 import 'package:metadata_fetch/src/utils/util.dart';
 import 'package:string_validator/string_validator.dart';
 
 /// Fetches a [url], validates it, and returns [Metadata].
-Future<Metadata> extract(String url) async {
+Future<Metadata?> extract(String url) async {
   if (!isURL(url)) {
     return null;
   }
@@ -19,9 +20,9 @@ Future<Metadata> extract(String url) async {
   defaultOutput.description = url;
 
   // Make our network call
-  final response = await http.get(url);
+  final response = await http.get(Uri.parse(url));
 
-  if (response.headers['content-type'].startsWith(r'image/')) {
+  if (response.headers['content-type']!.startsWith(r'image/')) {
     defaultOutput.title = '';
     defaultOutput.description = '';
     defaultOutput.image = url;
@@ -43,15 +44,15 @@ Future<Metadata> extract(String url) async {
 }
 
 /// Takes an [http.Response] and returns a [html.Document]
-Document responseToDocument(http.Response response) {
+Document? responseToDocument(http.Response response) {
   if (response.statusCode != 200) {
     return null;
   }
 
-  Document document;
+  Document? document;
   try {
     document = parser.parse(utf8.decode(response.bodyBytes));
-    document.requestUrl = response.request.url.toString();
+    document.requestUrl = response.request!.url.toString();
   } catch (err) {
     return document;
   }
