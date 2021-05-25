@@ -60,6 +60,18 @@ Document? responseToDocument(http.Response response) {
   return document;
 }
 
+Document? stringToDocument(String html) {
+  Document? document;
+  try {
+    document = parser.parse(html);
+    document.requestUrl = 'https://www.syngency.com';
+  } catch (err) {
+    return document;
+  }
+
+  return document;
+}
+
 /// Returns instance of [Metadata] with data extracted from the [html.Document]
 ///
 /// Future: Can pass in a strategy i.e: to retrieve only OpenGraph, or OpenGraph and Json+LD only
